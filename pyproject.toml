@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "menu-api"
+version = "0.1.0"
+description = ""
+authors = ["eliabebastosdias01@gmail.com"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["standard"], version = "^0.115.2"}
+setuptools = "^75.2.0"
+sqlalchemy = "^2.0.36"
+geoalchemy2 = "^0.15.2"
+python-dotenv = "^1.0.1"
+pytest = "^8.3.3"
+psycopg2 = "^2.9.10"
+sqlmodel = "^0.0.22"
+
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^2.3.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
