@@ -8,6 +8,16 @@
         "program": "${file}",
         "console": "integratedTerminal"
       }
-    ]
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "files.exclude": {
+        "**/*.pyc": {
+            "when": "$(basename).py"
+        },
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+    },
   }
   
