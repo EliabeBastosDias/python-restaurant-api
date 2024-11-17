@@ -1,33 +1,27 @@
 from venv import logger
 
-from internal.core.domain.menu import Menu
+from internal.controllers.menu.menu_params import InactivateMenuParams
 
-
-class InactivateMenuParams:
-    def __init__(self, token) -> None:
-        self.token = token
 
 class InactivateMenuResult:
     def __init__(self, success, result) -> None:
         self.success = success
         self.result = result
-    
+
     def to_dict(self):
-        return {
-            "success": self.success,
-            "result": self.result
-        }
+        return {"success": self.success, "result": self.result}
+
 
 class InactivateMenuCommand:
     def __init__(self, menurepository) -> None:
         self.__menurepository = menurepository
 
-    def execute(self, params):
+    def execute(self, params: InactivateMenuParams):
         try:
             logger.info("InactivateMenuCommand initiated", params)
 
             entity = self.__menurepository.get(token=params.token, onlyActives=True)
-            if entity == None:
+            if entity is None:
                 raise Exception("Menu not found")
 
             self.__menurepository.inactivate(token=params.token)
@@ -39,4 +33,3 @@ class InactivateMenuCommand:
             logger.error("InactivateMenuCommand failed", params, err)
 
             raise err
-    

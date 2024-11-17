@@ -1,12 +1,11 @@
 from internal.core.domain.menu import Menu
 from internal.core.domain.user import User
-from internal.repositories.menurepo import MenuRepository
-from internal.repositories.userrepo import UserRepository
+from internal.repositories.menu_repo import MenuRepository
+from internal.repositories.user_repo import UserRepository
 
 
-class Repositories():
+class Repositories:
     def __init__(self, connections):
         self.__connections = connections
-        self.menu = MenuRepository(self.__connections.core_database_session, Menu)
-        self.user = UserRepository(self.__connections.core_database_session, User)
-    
+        self.menu = MenuRepository(self.__connections, Menu)
+        self.user = UserRepository(self.__connections, User)

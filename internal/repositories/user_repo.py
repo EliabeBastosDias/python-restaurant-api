@@ -1,4 +1,4 @@
-from internal.repositories.baserepo import BaseRepository
+from internal.repositories.base_repo import BaseRepository
 from internal.core.domain.user import User
 
 

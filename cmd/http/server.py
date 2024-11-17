@@ -4,9 +4,11 @@ from internal.database.core_connection import DatabaseCoreConnection
 from internal.repositories.repositories import Repositories
 from internal.routes.router import Router
 
+
 class Connections:
     def __init__(self, core_database) -> None:
         self.core_database_session = core_database
+
 
 class HttpServer:
     def __init__(self) -> None:
@@ -22,6 +24,6 @@ class HttpServer:
         session = DatabaseCoreConnection().get_session()
         connections = Connections(session)
         return connections
-    
+
     def get_app(self):
         return self.__app

@@ -1,33 +1,28 @@
 from venv import logger
 
-from internal.core.domain.menu import Menu
+from internal.controllers.menu.menu_params import ListMenuParams
 
-
-class ListMenuParams:
-    def __init__(self, onlyActives: bool, page: int) -> None:
-        self.onlyActives = onlyActives
-        self.page = page
 
 class ListMenuResult:
     def __init__(self, success, result) -> None:
         self.success = success
         self.result = result
-    
+
     def to_dict(self):
-        return {
-            "success": self.success,
-            "result": self.result
-        }
+        return {"success": self.success, "result": self.result}
+
 
 class ListMenuCommand:
     def __init__(self, menurepository) -> None:
         self.__menurepository = menurepository
 
-    def execute(self, params):
+    def execute(self, params: ListMenuParams):
         try:
             logger.info("ListMenuCommand initiated", params)
 
-            entities = self.__menurepository.list(onlyActives=params.onlyActives, page=params.page)
+            entities = self.__menurepository.list(
+                onlyActives=params.onlyActives, page=params.page
+            )
             if len(entities) == 0:
                 raise Exception("Menus not found")
 
@@ -38,4 +33,3 @@ class ListMenuCommand:
             logger.error("ListMenuCommand failed", params, err)
 
             raise err
-    

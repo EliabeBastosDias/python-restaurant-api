@@ -3,11 +3,14 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
+from internal.core.interfaces.repo_interface import IRepository
+
 T = TypeVar("T")
 
 ITEM_BY_PAGE = 15
 
-class BaseRepository(Generic[T]):
+
+class BaseRepository(IRepository[T], Generic[T]):
     def __init__(self, session: Session, model: Type[T]):
         self.__session = session
         self.__model = model
@@ -20,6 +23,8 @@ class BaseRepository(Generic[T]):
         except SQLAlchemyError as exception:
             self.__session.rollback()
             raise exception
+        finally:
+            self.__session.close()
 
     def get(self, token: str, onlyActives: bool = False) -> Optional[T]:
         try:
@@ -30,19 +35,26 @@ class BaseRepository(Generic[T]):
             return query.first()
         except SQLAlchemyError as exception:
             raise RuntimeError(f"Database error occurred: {exception}") from exception
-
+        finally:
+            self.__session.close()
 
     def list(self, onlyActives: bool, page: int = 1) -> List[Dict]:
-        offset = (page - 1) * ITEM_BY_PAGE
+        try:
+            offset = (page - 1) * ITEM_BY_PAGE
 
-        query = select(T) 
-        if onlyActives:
-            query = query.filter(T.active == True)
+            query = select(self.__model)
+            if onlyActives:
+                query = query.filter(self.__model.active is True)
 
-        paginated_query = query.offset(offset).limit(ITEM_BY_PAGE)
-        
-        result = self.db_session.execute(paginated_query).scalars().all()
-        return [menu.to_dict() for menu in result]
+            paginated_query = query.offset(offset).limit(ITEM_BY_PAGE)
+
+            result = self.__session.execute(paginated_query).scalars().all()
+            return [menu.to_dict() for menu in result]
+        except SQLAlchemyError as exception:
+            self.__session.rollback()
+            raise exception
+        finally:
+            self.__session.close()
 
     def update(self, item_data: dict, token: str) -> Optional[T]:
         try:
@@ -56,18 +68,22 @@ class BaseRepository(Generic[T]):
         except SQLAlchemyError as exception:
             self.__session.rollback()
             raise exception
+        finally:
+            self.__session.close()
 
     def inactivate(self, token: str) -> Optional[T]:
         try:
             item = self.__session.query(self.__model).filter_by(token=token).first()
             if item:
-                item.active = False 
+                item.active = False
                 self.__session.commit()
                 return item
             return None
         except SQLAlchemyError as exception:
             self.__session.rollback()
             raise exception
+        finally:
+            self.__session.close()
 
     def delete(self, token: str) -> bool:
         try:
@@ -80,3 +96,5 @@ class BaseRepository(Generic[T]):
         except SQLAlchemyError as exception:
             self.__session.rollback()
             raise exception
+        finally:
+            self.__session.close()

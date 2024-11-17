@@ -1,8 +1,6 @@
-import os
-
 from internal.envs import EnvHandler, EnvKey
 
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 CORE_DSN = "{}+{}://{}:{}@{}:{}/{}?{}".format(
@@ -16,15 +14,15 @@ CORE_DSN = "{}+{}://{}:{}@{}:{}/{}?{}".format(
     EnvHandler.get(EnvKey.DB_OPTIONS),
 )
 
+
 class DatabaseCoreConnection:
     def __init__(self) -> None:
-        engine = create_engine(CORE_DSN)
-        event.listen(engine, "connect", self.__set_search_path)
-        self.__engine = engine
+        self.__engine = create_engine(CORE_DSN)
+        self.__session_maker = sessionmaker(bind=self.__engine)
+        # event.listen(self.__engine, "connect", self.__set_search_path)
 
     def get_session(self):
-        session_maker = sessionmaker(bind=self.__engine)
-        return session_maker()
+        return self.__session_maker()
 
     def __enter__(self):
         session_maker = sessionmaker(bind=self.__engine)
@@ -34,6 +32,6 @@ class DatabaseCoreConnection:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.session.close()
 
-    def __set_search_path(self, dbapi_connection, connection_record):
-        with dbapi_connection.cursor() as cursor:
-            cursor.execute("SET search_path TO app")
+    # def __set_search_path(self, dbapi_connection, connection_record):
+    #     with dbapi_connection.cursor() as cursor:
+    #         cursor.execute("SET search_path TO app")
