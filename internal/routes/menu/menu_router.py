@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 
-from internal.controllers.menu.menucontroller import MenuController
+from internal.controllers.menu.menu_controller import MenuController
 
 
 class MenuRouter:

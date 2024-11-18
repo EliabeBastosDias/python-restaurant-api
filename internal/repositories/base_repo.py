@@ -12,23 +12,23 @@ ITEM_BY_PAGE = 15
 
 class BaseRepository(IRepository[T], Generic[T]):
     def __init__(self, session: Session, model: Type[T]):
-        self.__session = session
-        self.__model = model
+        self._session = session
+        self._model = model
 
     def insert(self, item: T) -> T:
         try:
-            self.__session.add(item)
-            self.__session.commit()
+            self._session.add(item)
+            self._session.commit()
             return item
         except SQLAlchemyError as exception:
-            self.__session.rollback()
+            self._session.rollback()
             raise exception
         finally:
-            self.__session.close()
+            self._session.close()
 
     def get(self, token: str, onlyActives: bool = False) -> Optional[T]:
         try:
-            query = self.__session.query(self.__model).filter_by(token=token)
+            query = self._session.query(self._model).filter_by(token=token)
             if onlyActives:
                 query = query.filter_by(active=True)
 
@@ -36,65 +36,65 @@ class BaseRepository(IRepository[T], Generic[T]):
         except SQLAlchemyError as exception:
             raise RuntimeError(f"Database error occurred: {exception}") from exception
         finally:
-            self.__session.close()
+            self._session.close()
 
     def list(self, onlyActives: bool, page: int = 1) -> List[Dict]:
         try:
             offset = (page - 1) * ITEM_BY_PAGE
 
-            query = select(self.__model)
+            query = select(self._model)
             if onlyActives:
-                query = query.filter(self.__model.active is True)
+                query = query.filter(self._model.active is True)
 
             paginated_query = query.offset(offset).limit(ITEM_BY_PAGE)
 
-            result = self.__session.execute(paginated_query).scalars().all()
+            result = self._session.execute(paginated_query).scalars().all()
             return [menu.to_dict() for menu in result]
         except SQLAlchemyError as exception:
-            self.__session.rollback()
+            self._session.rollback()
             raise exception
         finally:
-            self.__session.close()
+            self._session.close()
 
     def update(self, item_data: dict, token: str) -> Optional[T]:
         try:
-            item = self.__session.query(self.__model).filter_by(token=token).first()
+            item = self._session.query(self._model).filter_by(token=token).first()
             if item:
                 for key, value in item_data.items():
                     setattr(item, key, value)
-                self.__session.commit()
+                self._session.commit()
                 return item
             return None
         except SQLAlchemyError as exception:
-            self.__session.rollback()
+            self._session.rollback()
             raise exception
         finally:
-            self.__session.close()
+            self._session.close()
 
     def inactivate(self, token: str) -> Optional[T]:
         try:
-            item = self.__session.query(self.__model).filter_by(token=token).first()
+            item = self._session.query(self._model).filter_by(token=token).first()
             if item:
                 item.active = False
-                self.__session.commit()
+                self._session.commit()
                 return item
             return None
         except SQLAlchemyError as exception:
-            self.__session.rollback()
+            self._session.rollback()
             raise exception
         finally:
-            self.__session.close()
+            self._session.close()
 
     def delete(self, token: str) -> bool:
         try:
-            item = self.__session.query(self.__model).filter_by(token=token).first()
+            item = self._session.query(self._model).filter_by(token=token).first()
             if item:
-                self.__session.delete(item)
-                self.__session.commit()
+                self._session.delete(item)
+                self._session.commit()
                 return True
             return False
         except SQLAlchemyError as exception:
-            self.__session.rollback()
+            self._session.rollback()
             raise exception
         finally:
-            self.__session.close()
+            self._session.close()

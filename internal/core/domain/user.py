@@ -13,6 +13,3 @@ class User(Base):
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     active = Column(Boolean, default=True)
-
-    def __repr__(self):
-        return f"<User(token={self.token}, email={self.email}, active={self.active})>"

@@ -2,6 +2,7 @@ from venv import logger
 
 from internal.controllers.menu.menu_params import CreateMenuParams
 from internal.core.domain.menu import Menu
+from internal.repositories.menu_repo import MenuRepository
 
 
 class CreateMenuResult:
@@ -14,7 +15,7 @@ class CreateMenuResult:
 
 
 class CreateMenuCommand:
-    def __init__(self, menurepository: Menu) -> None:
+    def __init__(self, menurepository: MenuRepository) -> None:
         self.__menurepository = menurepository
 
     def execute(self, params: CreateMenuParams):
@@ -29,21 +30,20 @@ class CreateMenuCommand:
 
             logger.info("CreateMenuCommand finished", params)
 
-            return CreateMenuResult(success=True, data=created_entity)
+            return CreateMenuResult(success=True, result=created_entity)
         except Exception as err:
             logger.error("CreateMenuCommand failed", params, err)
 
             raise err
 
-    def __check_if_menu_already_exists(self, params):
+    def __check_if_menu_already_exists(self, params: CreateMenuParams):
         existingMenu = self.__menurepository.getByName(params.name)
         if existingMenu is not None:
             raise Exception("Menu already exists")
 
-    def __build_menu(self, params):
-        builded_menu = Menu
-        builded_menu.name = params.name
+    def __build_menu(self, params: CreateMenuParams):
+        builded_menu = Menu(**params.__dict__)
         return builded_menu
 
-    def __persist_entities(self, builded_menu):
+    def __persist_entities(self, builded_menu: Menu):
         return self.__menurepository.insert(builded_menu)

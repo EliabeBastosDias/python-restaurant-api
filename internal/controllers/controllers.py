@@ -1,5 +1,5 @@
-from internal.controllers.menu.menucontroller import MenuController
-from internal.controllers.user.usercontroller import UserController
+from internal.controllers.menu.menu_controller import MenuController
+from internal.controllers.user.user_controller import UserController
 from internal.repositories.repositories import Repositories
 
 

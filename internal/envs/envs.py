@@ -2,6 +2,7 @@ import os
 from enum import Enum
 from dotenv import load_dotenv
 
+
 class EnvKey(Enum):
     SERVER_PORT = "SERVER_PORT"
     DB_DRIVER = "DB_DRIVER"
@@ -13,6 +14,7 @@ class EnvKey(Enum):
     DB_NAME = "DB_NAME"
     DB_OPTIONS = "DB_OPTIONS"
     JWT_SECRET = "JWT_SECRET"
+
 
 class EnvHandler:
     def get(key: EnvKey) -> str:

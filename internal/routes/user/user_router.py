@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from internal.controllers.user.usercontroller import UserController
+from internal.controllers.user.user_controller import UserController
 
 
 class UserRouter:

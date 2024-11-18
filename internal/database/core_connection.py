@@ -3,7 +3,7 @@ from internal.envs import EnvHandler, EnvKey
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-CORE_DSN = "{}+{}://{}:{}@{}:{}/{}?{}".format(
+CORE_DSN = "{}+{}://{}:{}@{}:{}/{}".format(
     EnvHandler.get(EnvKey.DB_TYPE),
     EnvHandler.get(EnvKey.DB_DRIVER),
     EnvHandler.get(EnvKey.DB_USER),
@@ -11,7 +11,6 @@ CORE_DSN = "{}+{}://{}:{}@{}:{}/{}?{}".format(
     EnvHandler.get(EnvKey.DB_HOST),
     EnvHandler.get_int(EnvKey.DB_PORT),
     EnvHandler.get(EnvKey.DB_NAME),
-    EnvHandler.get(EnvKey.DB_OPTIONS),
 )
 
 

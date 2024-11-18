@@ -7,3 +7,7 @@ class MenuCreateSchema(BaseModel):
 
 class MenuUpdateSchema(BaseModel):
     name: str
+
+
+class MenuCreateResponseSchema(BaseModel):
+    token: str
