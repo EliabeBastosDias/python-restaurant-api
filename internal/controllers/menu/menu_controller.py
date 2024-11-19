@@ -1,11 +1,6 @@
+from datetime import datetime
 from fastapi.responses import JSONResponse
-from internal.controllers.menu.menu_params import (
-    CreateMenuParams,
-    GetParams,
-    InactivateMenuParams,
-    ListMenuParams,
-    UpdateMenuParams,
-)
+
 from internal.core.usecases.menu import (
     CreateMenuCommand,
     GetMenuCommand,
@@ -13,37 +8,47 @@ from internal.core.usecases.menu import (
     UpdateMenuCommand,
     InactivateMenuCommand,
 )
-from internal.repositories.menu_repo import MenuRepository
-from internal.controllers.menu.menu_schema import MenuCreateSchema, MenuUpdateSchema
-from pkg.json.main import JsonHandler
+from internal.repositories.menu.menu_repo import MenuRepository
+from internal.controllers.menu.menu_schema import (
+    GetMenuRequestDTO,
+    InactivateMenuRequestDTO,
+    ListMenuRequestDTO,
+    MenuRequestDTO,
+    MenuResponseDTO,
+)
 
 
 class MenuController:
     def __init__(self, menurepo: MenuRepository) -> None:
         self.__menurepo = menurepo
 
-    def create_action(self, body: MenuCreateSchema):
-        execute_params = CreateMenuParams(**body.model_dump())
-        CreateMenuCommand(self.__menurepo).execute(execute_params)
+    def create_action(self, body: MenuRequestDTO):
+        result = CreateMenuCommand(self.__menurepo).execute(body)
+        
+        response_dict = result.__dict__.copy()
 
-        return JSONResponse(status_code=201, content="oi")
+        for key, value in response_dict.items():
+            if isinstance(value, datetime):
+                response_dict[key] = value.isoformat()
+
+
+        return JSONResponse(status_code=201, content=response_dict)
 
     def get_action(self, menu_token):
-        execute_params = GetParams(token=menu_token)
+        execute_params = GetMenuRequestDTO(token=menu_token)
         result = GetMenuCommand(self.__menurepo).execute(execute_params)
-        return JsonHandler.serialize_result(result)
+        return JSONResponse(status_code=200, content=result)
 
     def list_action(self, active: bool = False, page: int = 1):
-        execute_params = ListMenuParams(onlyActives=active, page=page)
+        execute_params = ListMenuRequestDTO(onlyActives=active, page=page)
         result = ListMenuCommand(self.__menurepo).execute(execute_params)
-        return JsonHandler.serialize_result(result)
+        return JSONResponse(status_code=200, content=result)
 
-    def update_action(self, body: MenuUpdateSchema, menu_token: str = None):
-        execute_params = UpdateMenuParams(**body.model_dump())
-        result = UpdateMenuCommand(self.__menurepo).execute(execute_params)
-        return JsonHandler.serialize_result(result)
+    def update_action(self, body: MenuRequestDTO, menu_token: str = None):
+        result = UpdateMenuCommand(self.__menurepo).execute(body, menu_token)
+        return JSONResponse(status_code=200, content=result)
 
     def inactivate_action(self, menu_token: str = None):
-        execute_params = InactivateMenuParams(token=menu_token)
+        execute_params = InactivateMenuRequestDTO(token=menu_token)
         result = InactivateMenuCommand(self.__menurepo).execute(execute_params)
-        return JsonHandler.serialize_result(result)
+        return JSONResponse(status_code=200, content=result)

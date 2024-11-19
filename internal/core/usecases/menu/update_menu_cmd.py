@@ -1,7 +1,8 @@
 from venv import logger
 
-from internal.controllers.menu.menu_params import UpdateMenuParams
+from internal.controllers.menu.menu_schema import MenuRequestDTO
 from internal.core.domain.menu import Menu
+from internal.repositories.menu.menu_repo import MenuRepository
 
 
 class UpdateMenuResult:
@@ -14,14 +15,14 @@ class UpdateMenuResult:
 
 
 class UpdateMenuCommand:
-    def __init__(self, menurepository) -> None:
+    def __init__(self, menurepository:MenuRepository) -> None:
         self.__menurepository = menurepository
 
-    def execute(self, params: UpdateMenuParams):
+    def execute(self, params: MenuRequestDTO, token: str):
         try:
             logger.info("UpdateMenuCommand initiated", params)
 
-            entity = self.__get_related_entities(params)
+            entity = self.__get_related_entities(token)
 
             builded_entity = self.__enrich_entity(entity, params)
 
@@ -35,13 +36,13 @@ class UpdateMenuCommand:
 
             raise err
 
-    def __get_related_entities(self, params: UpdateMenuParams):
-        entity = self.__menurepository.get(token=params.token)
+    def __get_related_entities(self, token: str):
+        entity = self.__menurepository.get(token)
         if entity is None:
             raise Exception("Menu not found")
         return entity
 
-    def __enrich_entity(self, entity, params: UpdateMenuParams):
+    def __enrich_entity(self, entity, params: MenuRequestDTO):
         entity.name = params.name
         return entity
 

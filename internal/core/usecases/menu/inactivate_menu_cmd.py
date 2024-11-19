@@ -1,22 +1,18 @@
 from venv import logger
 
-from internal.controllers.menu.menu_params import InactivateMenuParams
+from internal.controllers.menu.menu_schema import InactivateMenuRequestDTO
+from internal.repositories.menu.menu_repo import MenuRepository
 
 
-class InactivateMenuResult:
-    def __init__(self, success, result) -> None:
-        self.success = success
-        self.result = result
 
-    def to_dict(self):
-        return {"success": self.success, "result": self.result}
+
 
 
 class InactivateMenuCommand:
-    def __init__(self, menurepository) -> None:
+    def __init__(self, menurepository: MenuRepository) -> None:
         self.__menurepository = menurepository
 
-    def execute(self, params: InactivateMenuParams):
+    def execute(self, params: InactivateMenuRequestDTO) -> None:
         try:
             logger.info("InactivateMenuCommand initiated", params)
 
@@ -28,7 +24,6 @@ class InactivateMenuCommand:
 
             logger.info("InactivateMenuCommand finished", params)
 
-            return InactivateMenuResult(success=True, data=entity)
         except Exception as err:
             logger.error("InactivateMenuCommand failed", params, err)
 

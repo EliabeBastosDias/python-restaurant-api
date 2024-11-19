@@ -1,22 +1,16 @@
 from venv import logger
 
-from internal.controllers.menu.menu_params import ListMenuParams
+from internal.controllers.menu.menu_schema import ListMenuRequestDTO
 
 
-class ListMenuResult:
-    def __init__(self, success, result) -> None:
-        self.success = success
-        self.result = result
 
-    def to_dict(self):
-        return {"success": self.success, "result": self.result}
 
 
 class ListMenuCommand:
     def __init__(self, menurepository) -> None:
         self.__menurepository = menurepository
 
-    def execute(self, params: ListMenuParams):
+    def execute(self, params: ListMenuRequestDTO):
         try:
             logger.info("ListMenuCommand initiated", params)
 
@@ -28,7 +22,6 @@ class ListMenuCommand:
 
             logger.info("ListMenuCommand finished", params)
 
-            return ListMenuResult(success=True, data=entities)
         except Exception as err:
             logger.error("ListMenuCommand failed", params, err)
 
