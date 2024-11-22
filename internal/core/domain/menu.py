@@ -10,5 +10,5 @@ class Menu(Base):
     token = Column(String, primary_key=True, server_default=func.gen_random_uuid())
     name = Column(String, nullable=False)
     created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
     active = Column(Boolean, default=True)
