@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+
 from internal.controllers.controllers import Controllers
 from internal.routes.home.homeRouter import HomeRouter
 from internal.routes.menu.menu_router import MenuRouter

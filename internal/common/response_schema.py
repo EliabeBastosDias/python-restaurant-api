@@ -1,15 +1,15 @@
-from dataclasses import dataclass
-from typing import Dict, List, Union
+from pydantic import BaseModel
+from typing import Dict, List, Union, Generic, TypeVar
 
 
-@dataclass
-class BodyModel:
+T = TypeVar("T")
+class BodyModel(BaseModel, Generic[T]):
     success: bool
     message: str
-    data: Union[Dict, List[Dict], str]
+    data: T
 
 
-@dataclass
-class ResponseModel:
+class ResponseModel(BaseModel, Generic[T]):
     status_code: int
-    content: BodyModel
+    content: BodyModel[T]
+
