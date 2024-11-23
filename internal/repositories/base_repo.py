@@ -34,9 +34,7 @@ class BaseRepository(IRepository[T], Generic[T]):
 
                 return query.first()
             except SQLAlchemyError as exception:
-                raise RuntimeError(
-                    f"Database error occurred: {exception}"
-                ) from exception
+                raise exception
 
     def list(self, onlyActives: bool, page: int = 1) -> List[T]:
         with DatabaseCoreConnection() as session:

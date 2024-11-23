@@ -3,6 +3,7 @@ from venv import logger
 
 from internal.controllers.menu.menu_schema import ListMenuRequestDTO, MenuResponseDTO
 from internal.core.domain.menu import Menu
+from internal.errors.http_not_found import HttpNotFoundError
 from internal.repositories.menu.menu_repo import MenuRepository
 
 
@@ -26,7 +27,7 @@ class ListMenuCommand:
             onlyActives=params.onlyActives, page=params.page
         )
         if len(entities) == 0:
-            raise Exception("Menus not found")
+            raise HttpNotFoundError("Menus not found")
         return entities
 
     def __build_response(self, entities: List[Menu]) -> List[MenuResponseDTO]:

@@ -1,8 +1,8 @@
-from urllib import response
 from venv import logger
 
 from internal.controllers.menu.menu_schema import MenuRequestDTO, MenuResponseDTO
 from internal.core.domain.menu import Menu
+from internal.errors.http_bad_request import HttpBadRequestError
 from internal.repositories.menu.menu_repo import MenuRepository
 
 
@@ -32,7 +32,7 @@ class CreateMenuCommand:
     def __check_if_menu_already_exists(self, params: MenuRequestDTO):
         existingMenu = self.__menurepository.getByName(params.name)
         if existingMenu is not None:
-            raise Exception("Menu already exists")
+            raise HttpBadRequestError("Menu already exists")
 
     def __build_menu(self, params: MenuRequestDTO) -> Menu:
         builded_menu = Menu(**params.__dict__)

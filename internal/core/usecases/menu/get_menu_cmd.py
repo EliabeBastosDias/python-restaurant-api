@@ -2,6 +2,7 @@ from venv import logger
 
 from internal.controllers.menu.menu_schema import GetMenuRequestDTO, MenuResponseDTO
 from internal.core.domain.menu import Menu
+from internal.errors.http_not_found import HttpNotFoundError
 from internal.repositories.menu.menu_repo import MenuRepository
 
 
@@ -10,24 +11,19 @@ class GetMenuCommand:
         self.__menurepository = menurepository
 
     def execute(self, params: GetMenuRequestDTO) -> MenuResponseDTO:
-        try:
-            logger.info("GetMenuCommand initiated", params)
+        logger.info("GetMenuCommand initiated", params)
 
-            entity = self.__search_menu(params=params)
+        entity = self.__search_menu(params=params)
 
-            response = self.__build_response(entity)
+        response = self.__build_response(entity)
 
-            logger.info("GetMenuCommand finished", params)
-            return response
-        except Exception as err:
-            logger.error("GetMenuCommand failed", params, err)
-
-            raise err
+        logger.info("GetMenuCommand finished", params)
+        return response
 
     def __search_menu(self, params: GetMenuRequestDTO) -> Menu:
         entity = self.__menurepository.get(token=params.token)
         if entity is None:
-            raise Exception("Menu not found")
+            raise HttpNotFoundError("Menu not found")
         return entity
 
     def __build_response(self, entity: Menu) -> MenuResponseDTO:

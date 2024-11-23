@@ -2,6 +2,7 @@ from venv import logger
 
 from internal.controllers.menu.menu_schema import MenuRequestDTO, MenuResponseDTO
 from internal.core.domain.menu import Menu
+from internal.errors.http_not_found import HttpNotFoundError
 from internal.repositories.menu.menu_repo import MenuRepository
 
 
@@ -32,7 +33,7 @@ class UpdateMenuCommand:
     def __get_related_entities(self, token: str) -> Menu:
         entity = self.__menurepository.get(token)
         if entity is None:
-            raise Exception("Menu not found")
+            raise HttpNotFoundError("Menu not found")
         return entity
 
     def __enrich_entity(self, entity: Menu, params: MenuRequestDTO) -> Menu:

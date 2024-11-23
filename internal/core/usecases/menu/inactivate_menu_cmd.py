@@ -4,6 +4,7 @@ from internal.controllers.menu.menu_schema import (
     InactivateMenuRequestDTO,
 )
 from internal.core.domain.menu import Menu
+from internal.errors.http_not_found import HttpNotFoundError
 from internal.repositories.menu.menu_repo import MenuRepository
 
 
@@ -28,7 +29,7 @@ class InactivateMenuCommand:
     def __search_menu(self, params: InactivateMenuRequestDTO) -> Menu:
         entity = self.__menurepository.get(token=params.token, onlyActives=True)
         if entity is None:
-            raise Exception("Menu not found")
+            raise HttpNotFoundError("Menu not found")
         return entity
 
     def __inactivate_menu(self, entity: Menu) -> Menu:

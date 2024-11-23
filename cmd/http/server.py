@@ -1,13 +1,10 @@
 from fastapi import FastAPI
-from h11 import Response
-from sqlalchemy.orm.session import Session
+from fastapi.exceptions import RequestValidationError
 from internal.common.response_formatter import ResponseFormatter
 from internal.controllers.controllers import Controllers
-from internal.database.core_connection import DatabaseCoreConnection
+from internal.errors.error_handler import ErrorHandler
 from internal.repositories.repositories import Repositories
 from internal.routes.router import Router
-
-
 
 
 class HttpServer:
@@ -16,12 +13,21 @@ class HttpServer:
 
     def setup(self):
         formatter = self.utilities()
+        error_handler = self.setup_error_handler(formatter)
         repositories = Repositories()
-        controllers = Controllers(repositories, formatter)
+        controllers = Controllers(repositories, error_handler, formatter)
         Router(self.__app, controllers).setup()
-    
+
     def utilities(self) -> ResponseFormatter:
         formatter = ResponseFormatter()
         return formatter
+
+    def setup_error_handler(self, formatter: ResponseFormatter) -> ErrorHandler:
+        error_handler = ErrorHandler(formatter)
+        self.__app.add_exception_handler(
+            RequestValidationError, error_handler.handle_validation_errors
+        )
+        return error_handler
+
     def get_app(self):
         return self.__app
