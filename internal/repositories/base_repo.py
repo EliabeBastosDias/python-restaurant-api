@@ -45,7 +45,7 @@ class BaseRepository(IRepository[T], Generic[T]):
 
                 query = select(self._model)
                 if onlyActives:
-                    filtered_query = query.filter(self._model.active is True)
+                    filtered_query = query.filter(self._model.active == True)
 
                 paginated_query = filtered_query.offset(offset).limit(ITEM_BY_PAGE)
 

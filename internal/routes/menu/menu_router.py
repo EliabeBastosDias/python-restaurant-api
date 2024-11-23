@@ -1,7 +1,10 @@
 from fastapi import APIRouter
 
 from internal.controllers.menu.menu_controller import MenuController
-from internal.controllers.menu.menu_swagger import MenuResponseModel
+from internal.controllers.menu.menu_swagger import (
+    ListMenuResponseModel,
+    MenuResponseModel,
+)
 
 
 class MenuRouter:
@@ -27,6 +30,7 @@ class MenuRouter:
             endpoint=self.__menucontroller.list_action,
             methods=["GET"],
             status_code=200,
+            response_model=ListMenuResponseModel,
         )
         self.router.add_api_route(
             path="/{menu_token}",
