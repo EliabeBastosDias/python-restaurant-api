@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from internal.controllers.menu.menu_controller import MenuController
 from internal.controllers.menu.menu_swagger import (
     ListMenuResponseModel,
+    MenuNullResponseModel,
     MenuResponseModel,
 )
 
@@ -37,10 +38,12 @@ class MenuRouter:
             endpoint=self.__menucontroller.update_action,
             methods=["PUT"],
             status_code=200,
+            response_model=MenuResponseModel,
         )
         self.router.add_api_route(
             path="/{menu_token}/inactivate",
             endpoint=self.__menucontroller.inactivate_action,
             methods=["PATCH"],
             status_code=200,
+            response_model=MenuNullResponseModel,
         )

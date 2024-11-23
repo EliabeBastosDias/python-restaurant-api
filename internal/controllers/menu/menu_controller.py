@@ -1,5 +1,3 @@
-from fastapi.responses import JSONResponse
-
 from internal.common.response_formatter import ResponseFormatter
 from internal.common.response_schema import ResponseModel
 from internal.core.usecases.menu import (
@@ -46,11 +44,19 @@ class MenuController:
         )
         return response
 
-    def update_action(self, body: MenuRequestDTO, menu_token: str = None):
+    def update_action(
+        self, body: MenuRequestDTO, menu_token: str = None
+    ) -> ResponseModel:
         result = UpdateMenuCommand(self.__menurepo).execute(body, menu_token)
-        return JSONResponse(status_code=200, content=result)
+        response = self.__formatter.format_response(
+            status_code=200, message="Menu updated", data=result
+        )
+        return response
 
-    def inactivate_action(self, menu_token: str = None):
+    def inactivate_action(self, menu_token: str = None) -> ResponseModel:
         execute_params = InactivateMenuRequestDTO(token=menu_token)
-        result = InactivateMenuCommand(self.__menurepo).execute(execute_params)
-        return JSONResponse(status_code=200, content=result)
+        InactivateMenuCommand(self.__menurepo).execute(execute_params)
+        response = self.__formatter.format_response(
+            status_code=200, message="Menu deleted"
+        )
+        return response

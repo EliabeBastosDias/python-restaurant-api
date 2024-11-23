@@ -30,7 +30,7 @@ class BaseRepository(IRepository[T], Generic[T]):
             try:
                 query = session.query(self._model).filter_by(token=token)
                 if onlyActives:
-                    query = query.filter_by(active=True)
+                    query = query.filter_by(active=onlyActives)
 
                 return query.first()
             except SQLAlchemyError as exception:
@@ -44,38 +44,36 @@ class BaseRepository(IRepository[T], Generic[T]):
                 offset = (page - 1) * ITEM_BY_PAGE
 
                 query = select(self._model)
-                if onlyActives:
-                    filtered_query = query.filter(self._model.active == True)
+                if onlyActives is not None:
+                    query = query.filter(self._model.active == True)
 
-                paginated_query = filtered_query.offset(offset).limit(ITEM_BY_PAGE)
+                paginated_query = query.offset(offset).limit(ITEM_BY_PAGE)
 
                 result = session.execute(paginated_query).scalars().all()
                 return result
             except SQLAlchemyError as exception:
                 raise exception
 
-    def update(self, item_data: dict, token: str) -> Optional[T]:
+    def update(self, item_data: T) -> Optional[T]:
         with DatabaseCoreConnection() as session:
             try:
-                item = session.query(self._model).filter_by(token=token).first()
-                if item:
-                    for key, value in item_data.items():
-                        setattr(item, key, value)
-                    session.commit()
-                    return item
-                return None
+                session.merge(item_data)
+                session.commit()
+                result = (
+                    session.query(self._model).filter_by(token=item_data.token).first()
+                )
+                return result
             except SQLAlchemyError as exception:
                 session.rollback()
                 raise exception
 
-    def inactivate(self, token: str) -> Optional[T]:
+    def inactivate(self, token: str) -> None:
         with DatabaseCoreConnection() as session:
             try:
                 item = session.query(self._model).filter_by(token=token).first()
                 if item:
                     item.active = False
                     session.commit()
-                    return item
                 return None
             except SQLAlchemyError as exception:
                 session.rollback()

@@ -11,3 +11,7 @@ class MenuResponseModel(ResponseModel[MenuResponseDTO]):
 
 class ListMenuResponseModel(ResponseModel[List[MenuResponseDTO]]):
     pass
+
+
+class MenuNullResponseModel(ResponseModel):
+    pass

@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Dict, Optional, Union
 from .response_schema import BodyModel, ResponseModel
 from datetime import datetime, date
 from pydantic import BaseModel
@@ -31,14 +31,14 @@ class ResponseFormatter:
         self,
         status_code: int,
         message: str,
-        data: Union[BaseModel, Dict, str],
+        data: Optional[Union[BaseModel, Dict, str]] = None,
         error: bool = False,
     ) -> ResponseModel:
-        if isinstance(data, BaseModel):
-            data = data.model_dump()
-        if isinstance(data, dict):
-            data = self._convert_types_in_dict(data)
-
+        if data is not None:
+            if isinstance(data, BaseModel):
+                data = data.model_dump()
+            if isinstance(data, dict):
+                data = self._convert_types_in_dict(data)
         content = BodyModel(success=not error, message=message, data=data)
         response = ResponseModel(status_code=status_code, content=content)
         return response
