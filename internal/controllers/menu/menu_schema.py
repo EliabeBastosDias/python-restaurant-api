@@ -1,7 +1,4 @@
-from dataclasses import dataclass
 from datetime import datetime
-from os import name
-import token
 from typing import Optional
 from pydantic import BaseModel
 
@@ -29,6 +26,3 @@ class GetMenuRequestDTO(BaseModel):
 
 class InactivateMenuRequestDTO(BaseModel):
     token: str
-
-
-

@@ -1,5 +1,4 @@
-from typing import Type, TypeVar, Generic, Optional, List, Dict
-from sqlalchemy.orm import Session
+from typing import Type, TypeVar, Generic, Optional, List
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -8,7 +7,7 @@ from internal.database.core_connection import DatabaseCoreConnection
 
 T = TypeVar("T")
 
-ITEM_BY_PAGE = 15
+ITEM_BY_PAGE = 10
 
 
 class BaseRepository(IRepository[T], Generic[T]):
@@ -35,23 +34,24 @@ class BaseRepository(IRepository[T], Generic[T]):
 
                 return query.first()
             except SQLAlchemyError as exception:
-                raise RuntimeError(f"Database error occurred: {exception}") from exception
+                raise RuntimeError(
+                    f"Database error occurred: {exception}"
+                ) from exception
 
-    def list(self, onlyActives: bool, page: int = 1) -> List[Dict]:
+    def list(self, onlyActives: bool, page: int = 1) -> List[T]:
         with DatabaseCoreConnection() as session:
             try:
                 offset = (page - 1) * ITEM_BY_PAGE
 
                 query = select(self._model)
                 if onlyActives:
-                    query = query.filter(self._model.active is True)
+                    filtered_query = query.filter(self._model.active is True)
 
-                paginated_query = query.offset(offset).limit(ITEM_BY_PAGE)
+                paginated_query = filtered_query.offset(offset).limit(ITEM_BY_PAGE)
 
                 result = session.execute(paginated_query).scalars().all()
-                return [menu.to_dict() for menu in result]
+                return result
             except SQLAlchemyError as exception:
-                session.rollback()
                 raise exception
 
     def update(self, item_data: dict, token: str) -> Optional[T]:
@@ -93,4 +93,3 @@ class BaseRepository(IRepository[T], Generic[T]):
             except SQLAlchemyError as exception:
                 session.rollback()
                 raise exception
-
