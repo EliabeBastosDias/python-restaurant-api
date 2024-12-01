@@ -40,9 +40,11 @@ class BaseRepository(IRepository[T], Generic[T]):
         with DatabaseCoreConnection() as session:
             try:
                 offset = (page - 1) * ITEM_BY_PAGE
-
                 query = select(self._model)
-                if onlyActives is not None:
+
+                if onlyActives is False:
+                    query = query.filter(self._model.active == False)
+                else:
                     query = query.filter(self._model.active == True)
 
                 paginated_query = query.offset(offset).limit(ITEM_BY_PAGE)

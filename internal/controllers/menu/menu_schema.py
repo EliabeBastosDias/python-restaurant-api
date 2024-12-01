@@ -7,6 +7,10 @@ class MenuRequestDTO(BaseModel):
     name: str
 
 
+class CreateMenuResponseDTO(BaseModel):
+    token: str
+
+
 class MenuResponseDTO(BaseModel):
     token: str
     name: str

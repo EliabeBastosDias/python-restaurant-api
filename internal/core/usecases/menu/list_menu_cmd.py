@@ -1,6 +1,7 @@
 from typing import List
 from venv import logger
 
+from internal.common.mapper import mapper
 from internal.controllers.menu.menu_schema import ListMenuRequestDTO, MenuResponseDTO
 from internal.core.domain.menu import Menu
 from internal.errors.http_not_found import HttpNotFoundError
@@ -34,10 +35,4 @@ class ListMenuCommand:
         return list(map(self.__entity_to_dto, entities))
 
     def __entity_to_dto(self, entity: Menu) -> MenuResponseDTO:
-        return MenuResponseDTO(
-            token=entity.token,
-            name=entity.name,
-            active=entity.active,
-            created_at=entity.created_at,
-            updated_at=entity.updated_at,
-        )
+        return mapper.automapping_sqlalchemy_to_pydantic(entity, MenuResponseDTO)

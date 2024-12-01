@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 from internal.controllers.menu.menu_controller import MenuController
 from internal.controllers.menu.menu_swagger import (
+    CreateMenuResponseModel,
     ListMenuResponseModel,
     MenuNullResponseModel,
     MenuResponseModel,
@@ -24,7 +25,9 @@ class MenuRouter:
             endpoint=self.__menucontroller.create_action,
             methods=["POST"],
             status_code=201,
-            responses=self.__add_responses(MenuResponseModel, self.__default_responses),
+            responses=self.__add_responses(
+                CreateMenuResponseModel, self.__default_responses
+            ),
         )
         self.router.add_api_route(
             path="/{menu_token}",
